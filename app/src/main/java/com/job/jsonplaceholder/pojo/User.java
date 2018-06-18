@@ -1,16 +1,14 @@
 package com.job.jsonplaceholder.pojo;
 
-//import com.google.gson.annotations.Expose;
-//import com.google.gson.annotations.SerializedName;
-
 public class User {
 
-    //    @SerializedName("id")
-//    @Expose
     private Integer id;
-    //    @SerializedName("name")
-//    @Expose
     private String name;
+
+    public User(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
     public Integer getId() {
         return id;

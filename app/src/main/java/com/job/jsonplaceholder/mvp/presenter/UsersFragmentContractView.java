@@ -1,8 +1,9 @@
 package com.job.jsonplaceholder.mvp.presenter;
 
-/**
- * Created by slavik on 6/18/18.
- */
+import com.job.jsonplaceholder.pojo.User;
+
+import java.util.List;
 
 public interface UsersFragmentContractView {
+    void showUsers(List<User> users);
 }

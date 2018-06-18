@@ -22,21 +22,19 @@ public class UsersFragmentModel implements UsersFragmentContractModel {
 
     @Override
     public void downloadUsers(OnDownloadUsers onDownloadUsers) {
-        downloadUsersHandler = new DownloadUsersHandler(this, onDownloadUsers);
-        Runnable runnable = () -> {
+        downloadUsersHandler = new DownloadUsersHandler(onDownloadUsers);
+
+        new Thread(() -> {
             String usersAsString = getUsersAsString();
             if (usersAsString != null) {
                 JSONArray usersAsJsonArray = getUsersAsJsonArray(usersAsString);
                 if (usersAsJsonArray != null) {
-                    downloadUsersHandler.handleMessage(downloadUsersHandler.obtainMessage(SUCCESS, usersAsJsonArray));
+                    downloadUsersHandler.sendMessage(downloadUsersHandler.obtainMessage(SUCCESS, usersAsJsonArray));
                 }
             } else {
                 downloadUsersHandler.sendEmptyMessage(ERROR);
             }
-        };
-
-        Thread thread = new Thread(runnable);
-        thread.start();
+        }).start();
 
     }
 
@@ -79,25 +77,22 @@ public class UsersFragmentModel implements UsersFragmentContractModel {
     }
 
     private static class DownloadUsersHandler extends Handler {
-        private final WeakReference<UsersFragmentModel> model;
-        private final OnDownloadUsers onDownloadUsers;
+        private final WeakReference<OnDownloadUsers> onDownloadUsers;
 
-        DownloadUsersHandler(UsersFragmentModel model, OnDownloadUsers onDownloadUsers) {
-            this.onDownloadUsers = onDownloadUsers;
-            this.model = new WeakReference<>(model);
+        DownloadUsersHandler(OnDownloadUsers onDownloadUsers) {
+            this.onDownloadUsers = new WeakReference<>(onDownloadUsers);
         }
 
         @Override
         public void handleMessage(Message msg) {
-            UsersFragmentModel savedModel = model.get();
-            if (savedModel != null) {
+            if (onDownloadUsers.get() != null) {
                 switch (msg.what) {
                     case SUCCESS: {
-                        onDownloadUsers.onSuccess((JSONArray) msg.obj);
+                        onDownloadUsers.get().onSuccess((JSONArray) msg.obj);
                         break;
                     }
                     case ERROR: {
-                        onDownloadUsers.onError();
+                        onDownloadUsers.get().onError();
                     }
                 }
             }

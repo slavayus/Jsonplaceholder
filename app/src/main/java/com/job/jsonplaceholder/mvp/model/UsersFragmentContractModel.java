@@ -6,7 +6,7 @@ public interface UsersFragmentContractModel {
     void downloadUsers(OnDownloadUsers onDownloadUsers);
 
     interface OnDownloadUsers {
-        void onSuccess(JSONArray jObj);
+        void onSuccess(JSONArray jsonArray);
 
         void onError();
     }
