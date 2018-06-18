@@ -1,4 +1,4 @@
-package com.job.jsonplaceholder.model;
+package com.job.jsonplaceholder.mvp.model;
 
 import android.os.Handler;
 import android.os.Message;

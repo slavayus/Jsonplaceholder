@@ -1,8 +1,6 @@
-package com.job.jsonplaceholder;
+package com.job.jsonplaceholder.mvp.view;
 
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 
 public class UsersActivity extends SingleFragmentActivity {
 

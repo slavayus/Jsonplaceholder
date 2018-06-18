@@ -1,4 +1,4 @@
-package com.job.jsonplaceholder;
+package com.job.jsonplaceholder.mvp.view;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -9,9 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.job.jsonplaceholder.model.UsersFragmentModel;
-import com.job.jsonplaceholder.presenter.UsersFragmentContractView;
-import com.job.jsonplaceholder.presenter.UsersFragmentPresenter;
+import com.job.jsonplaceholder.R;
+import com.job.jsonplaceholder.mvp.model.UsersFragmentModel;
+import com.job.jsonplaceholder.mvp.presenter.UsersFragmentContractView;
+import com.job.jsonplaceholder.mvp.presenter.UsersFragmentPresenter;
 
 public class UsersFragment extends Fragment implements UsersFragmentContractView {
     private RecyclerView mRecyclerView;

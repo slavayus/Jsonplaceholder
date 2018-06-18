@@ -1,6 +1,6 @@
-package com.job.jsonplaceholder.presenter;
+package com.job.jsonplaceholder.mvp.presenter;
 
-import com.job.jsonplaceholder.model.UsersFragmentContractModel;
+import com.job.jsonplaceholder.mvp.model.UsersFragmentContractModel;
 
 import org.json.JSONArray;
 

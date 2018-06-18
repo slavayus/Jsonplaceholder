@@ -1,9 +1,11 @@
-package com.job.jsonplaceholder;
+package com.job.jsonplaceholder.mvp.view;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
+
+import com.job.jsonplaceholder.R;
 
 /**
  * Abstract activity to starting transactions for fragments
