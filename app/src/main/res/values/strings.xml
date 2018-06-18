@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Jsonplaceholder</string>
     <string name="user_name">User name</string>
+    <string name="loading_users">Loading users. Please wait…</string>
+    <string name="loading_users_error_title">Error</string>
+    <string name="loading_users_error_message">Some problems occurred while loading users</string>
 </resources>

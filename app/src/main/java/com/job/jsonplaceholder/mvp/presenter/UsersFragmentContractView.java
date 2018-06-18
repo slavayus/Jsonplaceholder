@@ -6,4 +6,10 @@ import java.util.List;
 
 public interface UsersFragmentContractView {
     void showUsers(List<User> users);
+
+    void showProgressDialog();
+
+    void dismissProgressDialog();
+
+    void showErrorLoadingUsersDialog();
 }

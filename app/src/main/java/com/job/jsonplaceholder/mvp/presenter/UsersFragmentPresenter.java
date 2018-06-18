@@ -1,5 +1,7 @@
 package com.job.jsonplaceholder.mvp.presenter;
 
+import android.util.Log;
+
 import com.job.jsonplaceholder.mvp.model.UsersFragmentContractModel;
 import com.job.jsonplaceholder.pojo.User;
 
@@ -13,6 +15,7 @@ import java.util.List;
 
 public class UsersFragmentPresenter {
 
+    private static final String TAG = "UsersFragmentPresenter";
     private final UsersFragmentContractModel model;
     private WeakReference<UsersFragmentContractView> view;
 
@@ -29,12 +32,16 @@ public class UsersFragmentPresenter {
     }
 
     private void downloadUsers() {
+        view.get().showProgressDialog();
         model.downloadUsers(new UsersFragmentContractModel.OnDownloadUsers() {
 
             @Override
             public void onSuccess(JSONArray jsonArray) {
+                Log.d(TAG, "onSuccess: get users");
                 try {
                     if (viewIsValid()) {
+                        Log.d(TAG, "onSuccess: parse users");
+                        view.get().dismissProgressDialog();
                         view.get().showUsers(parseJSONArray(jsonArray));
                     }
                 } catch (JSONException e) {
@@ -53,7 +60,11 @@ public class UsersFragmentPresenter {
 
             @Override
             public void onError() {
-
+                if (viewIsValid()) {
+                    Log.d(TAG, "onError: loading users");
+                    view.get().dismissProgressDialog();
+                    view.get().showErrorLoadingUsersDialog();
+                }
             }
         });
     }

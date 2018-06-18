@@ -2,6 +2,7 @@ package com.job.jsonplaceholder.mvp.model;
 
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 import com.job.jsonplaceholder.utils.URLHelper;
 
@@ -11,11 +12,11 @@ import org.json.JSONException;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class UsersFragmentModel implements UsersFragmentContractModel {
+    private static final String TAG = "UsersFragmentModel";
     private DownloadUsersHandler downloadUsersHandler = null;
     private static final int SUCCESS = 200;
     private static final int ERROR = 400;
@@ -26,12 +27,16 @@ public class UsersFragmentModel implements UsersFragmentContractModel {
 
         new Thread(() -> {
             String usersAsString = getUsersAsString();
+            Log.d(TAG, "downloadUsers: getUsersAsString");
             if (usersAsString != null) {
                 JSONArray usersAsJsonArray = getUsersAsJsonArray(usersAsString);
+                Log.d(TAG, "downloadUsers: getUsersAsArray");
                 if (usersAsJsonArray != null) {
+                    Log.d(TAG, "downloadUsers: notify");
                     downloadUsersHandler.sendMessage(downloadUsersHandler.obtainMessage(SUCCESS, usersAsJsonArray));
                 }
             } else {
+                Log.d(TAG, "downloadUsers: error");
                 downloadUsersHandler.sendEmptyMessage(ERROR);
             }
         }).start();
@@ -77,26 +82,27 @@ public class UsersFragmentModel implements UsersFragmentContractModel {
     }
 
     private static class DownloadUsersHandler extends Handler {
-        private final WeakReference<OnDownloadUsers> onDownloadUsers;
+        private final OnDownloadUsers onDownloadUsers;
 
         DownloadUsersHandler(OnDownloadUsers onDownloadUsers) {
-            this.onDownloadUsers = new WeakReference<>(onDownloadUsers);
+            this.onDownloadUsers = onDownloadUsers;
         }
 
         @Override
         public void handleMessage(Message msg) {
-            if (onDownloadUsers.get() != null) {
-                switch (msg.what) {
-                    case SUCCESS: {
-                        onDownloadUsers.get().onSuccess((JSONArray) msg.obj);
-                        break;
-                    }
-                    case ERROR: {
-                        onDownloadUsers.get().onError();
-                    }
+            Log.d(TAG, "handleMessage: notified");
+            switch (msg.what) {
+                case SUCCESS: {
+                    Log.d(TAG, "handleMessage: notified success");
+                    onDownloadUsers.onSuccess((JSONArray) msg.obj);
+                    break;
+                }
+                case ERROR: {
+                    Log.d(TAG, "handleMessage: notified error");
+                    onDownloadUsers.onError();
                 }
             }
         }
     }
-
 }
+
