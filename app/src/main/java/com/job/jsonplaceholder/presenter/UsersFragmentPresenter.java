@@ -2,9 +2,7 @@ package com.job.jsonplaceholder.presenter;
 
 import com.job.jsonplaceholder.model.UsersFragmentContractModel;
 
-/**
- * Created by slavik on 6/18/18.
- */
+import org.json.JSONArray;
 
 public class UsersFragmentPresenter {
 
@@ -27,8 +25,8 @@ public class UsersFragmentPresenter {
         model.downloadUsers(new UsersFragmentContractModel.OnDownloadUsers(){
 
             @Override
-            public void onSuccess() {
-
+            public void onSuccess(JSONArray jObj) {
+                System.out.println(jObj);
             }
 
             @Override

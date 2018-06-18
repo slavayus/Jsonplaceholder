@@ -1,14 +1,12 @@
 package com.job.jsonplaceholder.model;
 
-/**
- * Created by slavik on 6/18/18.
- */
+import org.json.JSONArray;
 
 public interface UsersFragmentContractModel {
     void downloadUsers(OnDownloadUsers onDownloadUsers);
 
     interface OnDownloadUsers {
-        void onSuccess();
+        void onSuccess(JSONArray jObj);
 
         void onError();
     }
