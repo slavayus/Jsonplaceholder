@@ -1,6 +1,7 @@
 package com.job.jsonplaceholder.mvp.view;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -8,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +23,8 @@ import com.job.jsonplaceholder.pojo.User;
 
 import java.util.List;
 
-public class UsersFragment extends Fragment implements UsersFragmentContractView {
+public class UsersFragment extends Fragment implements UsersFragmentContractView, OnUserClickListener {
+    private static final String TAG = "UsersFragment";
     private RecyclerView mRecyclerView;
     private UsersFragmentPresenter mPresenter;
     private ProgressDialog dialog;
@@ -42,13 +45,12 @@ public class UsersFragment extends Fragment implements UsersFragmentContractView
     }
 
     public static Fragment newInstance() {
-
         return new UsersFragment();
     }
 
     @Override
     public void showUsers(List<User> users) {
-        mRecyclerView.setAdapter(new UsersAdapter(users));
+        mRecyclerView.setAdapter(new UsersAdapter(users, this));
     }
 
     @Override
@@ -80,5 +82,11 @@ public class UsersFragment extends Fragment implements UsersFragmentContractView
                 .create();
         alertDialog.setCanceledOnTouchOutside(false);
         alertDialog.show();
+    }
+
+    @Override
+    public void onClick(User user) {
+        startActivity(PhotosActivity.newInstance(getContext(), user));
+        Log.d(TAG, "onClick: " + user.getName());
     }
 }
