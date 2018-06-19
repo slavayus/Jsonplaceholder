@@ -8,14 +8,15 @@
         <item name="colorControlHighlight">@color/colorAccent</item>
     </style>
 
-    <style name="AppTheme.TextView" />
-
-    <style name="AppTheme.TextView.UserName">
+    <style name="AppTheme.TextView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:padding">@dimen/activity_vertical_margin</item>
         <item name="android:textColor">?attr/colorPrimary</item>
         <item name="android:gravity">center_vertical</item>
+    </style>
+
+    <style name="AppTheme.TextView.UserName">
+        <item name="android:padding">@dimen/activity_vertical_margin</item>
     </style>
 
 </resources>

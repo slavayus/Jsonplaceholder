@@ -4,4 +4,5 @@
     <string name="loading_users">Loading users. Please wait…</string>
     <string name="loading_users_error_title">Error</string>
     <string name="loading_users_error_message">Some problems occurred while loading users</string>
+    <string name="user_photo">user photo</string>
 </resources>
