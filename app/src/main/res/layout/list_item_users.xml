@@ -10,7 +10,7 @@
 
     <TextView
         android:id="@+id/user_name"
-        style="@style/AppTheme.TextView.UserName"
+        style="@style/AppTheme.TextView"
         android:drawableEnd="@drawable/ic_choose_user_24dp"
         android:text="@string/user_name" />
 
