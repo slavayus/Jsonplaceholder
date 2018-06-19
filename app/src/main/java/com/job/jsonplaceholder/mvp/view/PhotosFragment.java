@@ -4,17 +4,23 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.job.jsonplaceholder.R;
+import com.job.jsonplaceholder.mvp.model.PhotosFragmentModel;
+import com.job.jsonplaceholder.mvp.presenter.PhotosFragmentContractView;
+import com.job.jsonplaceholder.mvp.presenter.PhotosFragmentPresenter;
 import com.job.jsonplaceholder.pojo.User;
 
-public class PhotosFragment extends Fragment {
+public class PhotosFragment extends Fragment implements PhotosFragmentContractView {
     private static final String USER = "USER";
     private User user;
+    private RecyclerView mRecyclerView;
+    private PhotosFragmentPresenter mPresenter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,14 +41,28 @@ public class PhotosFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_photos, container, false);
 
-        TextView textView = view.findViewById(R.id.user_name);
-        textView.setText(user.getName());
+        mRecyclerView = view.findViewById(R.id.recycler_view_photos);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        mPresenter = new PhotosFragmentPresenter(new PhotosFragmentModel());
+        mPresenter.attachView(this);
+        mPresenter.viewIsReady();
 
         return view;
     }
 
-    public static PhotosFragment newInstance(User user) {
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mPresenter.destroyView();
+    }
 
+    @Override
+    public User gerUser() {
+        return user;
+    }
+
+    public static PhotosFragment newInstance(User user) {
         Bundle args = new Bundle();
         args.putParcelable(USER, user);
         PhotosFragment fragment = new PhotosFragment();
