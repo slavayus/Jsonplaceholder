@@ -14,4 +14,6 @@ public interface PhotosFragmentContractView {
     List<Photo> getPhotos();
 
     void notifyImageLoaded(int index);
+
+    void notifyImageUpdated(int index);
 }

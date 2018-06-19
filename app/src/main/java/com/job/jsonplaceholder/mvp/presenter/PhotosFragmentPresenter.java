@@ -60,6 +60,13 @@ public class PhotosFragmentPresenter {
             public void onError() {
 
             }
+
+            @Override
+            public void progressChanged(Photo photo) {
+                if (viewIsValid()) {
+                    view.get().notifyImageUpdated(photo.getPosition());
+                }
+            }
         });
 
     }

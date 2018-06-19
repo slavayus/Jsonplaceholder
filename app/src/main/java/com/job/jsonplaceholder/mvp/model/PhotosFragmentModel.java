@@ -2,7 +2,6 @@ package com.job.jsonplaceholder.mvp.model;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -16,6 +15,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,7 +24,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PhotosFragmentModel implements PhotosFragmentContractModel {
@@ -32,6 +32,7 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
     private static final int SUCCESS_ALL = 201;
     private static final int SUCCESS_BITMAP = 202;
     private static final int ERROR = 400;
+    private static final int PROGRESS = 300;
     private AtomicBoolean running = new AtomicBoolean(true);
 
     @Override
@@ -133,12 +134,14 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
 
         new Thread(() -> {
             for (Photo photo : photos) {
+//            for (int i = 0; i < 50; i++) {
+//                Photo photo = photos.get(i);
                 if (!running.get()) {
                     return;
                 }
                 Log.d(TAG, "downloadPhotoBitmap: start photo " + photo.getPosition());
                 try {
-                    photo.setBitmap(downloadBitmap(photo.getUrl()));
+                    photo.setBitmap(downloadBitmap(photo, downloadPhotoBitmapHandler));
                     downloadPhotoBitmapHandler.sendMessage(downloadPhotoBitmapHandler.obtainMessage(SUCCESS_BITMAP, photo));
                 } catch (IOException e) {
                     Log.d(TAG, "downloadUsers: error" + e.getMessage());
@@ -149,13 +152,26 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
         }).start();
     }
 
-    private Bitmap downloadBitmap(String uri) throws IOException {
-        URL url = new URL(uri);
+    private Bitmap downloadBitmap(Photo photo, DownloadPhotoBitmapHandler downloadPhotoBitmapHandler) throws IOException {
+        URL url = new URL(photo.getUrl());
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setDoInput(true);
         connection.connect();
         InputStream input = connection.getInputStream();
-        return BitmapFactory.decodeStream(input);
+
+        int coefficient = 100 / ((connection.getContentLength()) / 128);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        int c;
+        byte[] b = new byte[128];
+
+        while ((c = input.read(b)) != -1) {
+            photo.setProgress(photo.getProgress() + coefficient);
+            downloadPhotoBitmapHandler.sendMessage(downloadPhotoBitmapHandler.obtainMessage(PROGRESS, photo));
+            byteArrayOutputStream.write(b, 0, c);
+        }
+
+        InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+        return BitmapFactory.decodeStream(inputStream);
     }
 
     @Override
@@ -178,6 +194,11 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
                     Log.d(TAG, "handleMessage: notified success bitmap");
                     onDownloadBitmap.onSuccess((Photo) msg.obj);
                     break;
+                }
+                case PROGRESS: {
+                    Log.d(TAG, "handleMessage: notified progress bitmap");
+                    onDownloadBitmap.progressChanged((Photo) msg.obj);
+                    return;
                 }
                 case ERROR: {
                     Log.d(TAG, "handleMessage: notified error bitmap");

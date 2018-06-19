@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.job.jsonplaceholder.R;
@@ -53,16 +54,25 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotosHold
     class PhotosHolder extends RecyclerView.ViewHolder {
         private TextView photoTitle;
         private ImageView photoView;
+        private ProgressBar progressBar;
 
         PhotosHolder(View view) {
             super(view);
             photoTitle = view.findViewById(R.id.photo_title);
             photoView = view.findViewById(R.id.photo_image_view);
+            progressBar = view.findViewById(R.id.progress_bar);
         }
 
         void bind(Photo photo) {
             photoTitle.setText(photo.getTitle());
             photoView.setImageBitmap(photo.getBitmap());
+
+            if (photo.getProgress() > 100) {
+                progressBar.setVisibility(View.GONE);
+            } else {
+                progressBar.setVisibility(View.VISIBLE);
+                progressBar.setProgress(photo.getProgress());
+            }
         }
     }
 }

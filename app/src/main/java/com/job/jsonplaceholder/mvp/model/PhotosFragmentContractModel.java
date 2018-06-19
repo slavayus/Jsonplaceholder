@@ -25,5 +25,7 @@ public interface PhotosFragmentContractModel {
         void onSuccess(Photo photo);
 
         void onError();
+
+        void progressChanged(Photo photo);
     }
 }

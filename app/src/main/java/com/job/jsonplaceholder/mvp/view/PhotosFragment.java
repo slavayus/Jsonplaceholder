@@ -84,6 +84,11 @@ public class PhotosFragment extends Fragment implements PhotosFragmentContractVi
         mPhotosAdapter.notifyItemChanged(index);
     }
 
+    @Override
+    public void notifyImageUpdated(int index) {
+        mPhotosAdapter.notifyItemChanged(index);
+    }
+
     public static PhotosFragment newInstance(User user) {
         Bundle args = new Bundle();
         args.putParcelable(USER, user);
