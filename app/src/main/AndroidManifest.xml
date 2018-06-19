@@ -18,7 +18,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".mvp.view.PhotosActivity"></activity>
+        <activity
+            android:name=".mvp.view.PhotosActivity"
+            android:parentActivityName=".mvp.view.UsersActivity" />
     </application>
 
 </manifest>
