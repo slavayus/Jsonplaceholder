@@ -14,7 +14,11 @@ import com.job.jsonplaceholder.R;
 import com.job.jsonplaceholder.mvp.model.PhotosFragmentModel;
 import com.job.jsonplaceholder.mvp.presenter.PhotosFragmentContractView;
 import com.job.jsonplaceholder.mvp.presenter.PhotosFragmentPresenter;
+import com.job.jsonplaceholder.mvp.view.adapter.PhotosAdapter;
+import com.job.jsonplaceholder.pojo.Photo;
 import com.job.jsonplaceholder.pojo.User;
+
+import java.util.List;
 
 public class PhotosFragment extends Fragment implements PhotosFragmentContractView {
     private static final String USER = "USER";
@@ -60,6 +64,11 @@ public class PhotosFragment extends Fragment implements PhotosFragmentContractVi
     @Override
     public User gerUser() {
         return user;
+    }
+
+    @Override
+    public void showPhotos(List<Photo> photos) {
+        mRecyclerView.setAdapter(new PhotosAdapter(photos));
     }
 
     public static PhotosFragment newInstance(User user) {

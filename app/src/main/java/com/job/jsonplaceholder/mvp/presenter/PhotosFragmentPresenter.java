@@ -1,8 +1,10 @@
 package com.job.jsonplaceholder.mvp.presenter;
 
 import com.job.jsonplaceholder.mvp.model.PhotosFragmentContractModel;
+import com.job.jsonplaceholder.pojo.Photo;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 public class PhotosFragmentPresenter {
     private final PhotosFragmentContractModel model;
@@ -21,7 +23,20 @@ public class PhotosFragmentPresenter {
     }
 
     private void downloadUserPhotos() {
-        model.downloadUserPhotos(view.get().gerUser());
+        model.downloadUserPhotos(view.get().gerUser(), new PhotosFragmentContractModel.OnDownloadPhotos(){
+
+            @Override
+            public void onSuccess(List<Photo> photos) {
+                if (viewIsValid()) {
+                    view.get().showPhotos(photos);
+                }
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        });
     }
 
     private boolean viewIsValid() {
