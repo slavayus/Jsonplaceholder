@@ -36,19 +36,20 @@ public class PhotosFragmentPresenter {
             public void onError() {
 
             }
-
-            @Override
-            public void onComplete() {
-                if (viewIsValid()) {
-                    startDownloadPhotosBitmap(view.get().getPhotos());
-                }
-            }
         });
     }
 
-    private void startDownloadPhotosBitmap(List<Photo> photos) {
-        model.downloadPhotoBitmap(photos, new PhotosFragmentContractModel.OnDownloadBitmap() {
+    private boolean viewIsValid() {
+        return view.get() != null;
+    }
 
+    public void destroyView() {
+        view.clear();
+        model.stop();
+    }
+
+    public void loadBitmap(Photo photo) {
+        model.downloadPhotoBitmap(photo, new PhotosFragmentContractModel.OnDownloadBitmap() {
             @Override
             public void onSuccess(Photo photo) {
                 if (viewIsValid()) {
@@ -68,15 +69,5 @@ public class PhotosFragmentPresenter {
                 }
             }
         });
-
-    }
-
-    private boolean viewIsValid() {
-        return view.get() != null;
-    }
-
-    public void destroyView() {
-        view.clear();
-        model.stop();
     }
 }

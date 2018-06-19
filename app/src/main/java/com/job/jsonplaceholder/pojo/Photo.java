@@ -2,15 +2,13 @@ package com.job.jsonplaceholder.pojo;
 
 import android.graphics.Bitmap;
 
-/**
- * Created by slavik on 6/19/18.
- */
+import java.lang.ref.SoftReference;
 
 public class Photo {
     private int id;
     private String title;
     private String url;
-    private Bitmap bitmap;
+    private SoftReference<Bitmap> bitmap;
     private int position;
     private int progress;
 
@@ -37,11 +35,14 @@ public class Photo {
     }
 
     public void setBitmap(Bitmap bitmap) {
-        this.bitmap = bitmap;
+        this.bitmap = new SoftReference<>(bitmap);
     }
 
     public Bitmap getBitmap() {
-        return bitmap;
+        if (bitmap != null) {
+            return bitmap.get();
+        }
+        return null;
     }
 
     public int getPosition() {

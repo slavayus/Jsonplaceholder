@@ -18,7 +18,16 @@ import java.util.List;
 
 public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotosHolder> {
 
+    private final Loader loader;
     private List<Photo> mData = new ArrayList<>();
+
+    public PhotosAdapter(Loader loader) {
+        this.loader = loader;
+    }
+
+    public interface Loader {
+        void load(Photo photo);
+    }
 
     @NonNull
     @Override
@@ -30,6 +39,9 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotosHold
 
     @Override
     public void onBindViewHolder(@NonNull PhotosHolder holder, int position) {
+        if(mData.get(position).getBitmap()==null){
+            loader.load(mData.get(position));
+        }
         holder.bind(mData.get(position));
     }
 

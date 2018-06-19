@@ -20,10 +20,9 @@ import com.job.jsonplaceholder.pojo.User;
 
 import java.util.List;
 
-public class PhotosFragment extends Fragment implements PhotosFragmentContractView {
+public class PhotosFragment extends Fragment implements PhotosFragmentContractView, PhotosAdapter.Loader {
     private static final String USER = "USER";
     private User user;
-    private RecyclerView mRecyclerView;
     private PhotosFragmentPresenter mPresenter;
     private PhotosAdapter mPhotosAdapter;
 
@@ -46,9 +45,9 @@ public class PhotosFragment extends Fragment implements PhotosFragmentContractVi
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_photos, container, false);
 
-        mRecyclerView = view.findViewById(R.id.recycler_view_photos);
+        RecyclerView mRecyclerView = view.findViewById(R.id.recycler_view_photos);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        mPhotosAdapter = new PhotosAdapter();
+        mPhotosAdapter = new PhotosAdapter(this);
         mRecyclerView.setAdapter(mPhotosAdapter);
 
         mPresenter = new PhotosFragmentPresenter(new PhotosFragmentModel(getContext()));
@@ -95,5 +94,10 @@ public class PhotosFragment extends Fragment implements PhotosFragmentContractVi
         PhotosFragment fragment = new PhotosFragment();
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void load(Photo photo) {
+        mPresenter.loadBitmap(photo);
     }
 }

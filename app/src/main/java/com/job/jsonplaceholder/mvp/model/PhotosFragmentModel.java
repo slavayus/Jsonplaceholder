@@ -32,9 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PhotosFragmentModel implements PhotosFragmentContractModel {
     private static final String TAG = "PhotosFragmentModel";
-    private static final int SUCCESS_ALBUM = 200;
-    private static final int SUCCESS_ALL = 201;
-    private static final int SUCCESS_BITMAP = 202;
+    private static final int SUCCESS = 200;
     private static final int ERROR = 400;
     private static final int PROGRESS = 300;
     private AtomicBoolean running = new AtomicBoolean(true);
@@ -58,10 +56,8 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
                         return;
                     }
                     JSONObject album = albumsAsJsonArray.getJSONObject(i);
-                    downloadUserPhotosHandler.sendMessage(downloadUserPhotosHandler.obtainMessage(SUCCESS_ALBUM, parseAlbumPhotos(album)));
+                    downloadUserPhotosHandler.sendMessage(downloadUserPhotosHandler.obtainMessage(SUCCESS, parseAlbumPhotos(album)));
                 }
-
-                downloadUserPhotosHandler.sendMessage(downloadUserPhotosHandler.obtainMessage(SUCCESS_ALL));
             } catch (IOException | JSONException e) {
                 Log.d(TAG, "downloadUsers: error" + e.getMessage());
                 e.printStackTrace();
@@ -119,14 +115,9 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
         public synchronized void handleMessage(Message msg) {
             Log.d(TAG, "handleMessage: notified");
             switch (msg.what) {
-                case SUCCESS_ALBUM: {
+                case SUCCESS: {
                     Log.d(TAG, "handleMessage: notified success");
                     onDownloadPhotos.onSuccess(((List<Photo>) msg.obj));
-                    break;
-                }
-                case SUCCESS_ALL: {
-                    Log.d(TAG, "handleMessage: notified success all");
-                    onDownloadPhotos.onComplete();
                     break;
                 }
                 case ERROR: {
@@ -138,26 +129,19 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
     }
 
     @Override
-    public void downloadPhotoBitmap(List<Photo> photos, OnDownloadBitmap onDownloadBitmap) {
+    public void downloadPhotoBitmap(Photo photo, OnDownloadBitmap onDownloadBitmap) {
         DownloadPhotoBitmapHandler downloadPhotoBitmapHandler = new DownloadPhotoBitmapHandler(onDownloadBitmap);
 
         new Thread(() -> {
-            for (Photo photo : photos) {
-//            for (int i = 0; i < 50; i++) {
-//                Photo photo = photos.get(i);
-                if (!running.get()) {
-                    return;
-                }
-                Log.d(TAG, "downloadPhotoBitmap: start photo " + photo.getPosition());
-                try {
-                    Bitmap bitmap = loadImageBitmapFromStorage(String.valueOf(photo.getId()));
-                    photo.setBitmap(bitmap == null ? downloadBitmap(photo, downloadPhotoBitmapHandler) : bitmap);
-                    downloadPhotoBitmapHandler.sendMessage(downloadPhotoBitmapHandler.obtainMessage(SUCCESS_BITMAP, photo));
-                } catch (IOException e) {
-                    Log.d(TAG, "downloadUsers: error" + e.getMessage());
-                    downloadPhotoBitmapHandler.sendEmptyMessage(ERROR);
-                    e.printStackTrace();
-                }
+            Log.d(TAG, "downloadPhotoBitmap: start photo " + photo.getPosition());
+            try {
+                Bitmap bitmap = loadImageBitmapFromStorage(String.valueOf(photo.getId()));
+                photo.setBitmap(bitmap == null ? downloadBitmap(photo, downloadPhotoBitmapHandler) : bitmap);
+                downloadPhotoBitmapHandler.sendMessage(downloadPhotoBitmapHandler.obtainMessage(SUCCESS, photo));
+            } catch (IOException e) {
+                Log.d(TAG, "downloadUsers: error" + e.getMessage());
+                downloadPhotoBitmapHandler.sendEmptyMessage(ERROR);
+                e.printStackTrace();
             }
         }).start();
     }
@@ -169,7 +153,7 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
         connection.connect();
         InputStream input = connection.getInputStream();
 
-        int coefficient = 100 / ((connection.getContentLength()) / 128)+1;
+        int coefficient = 100 / ((connection.getContentLength()) / 128) + 1;
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         int c;
         byte[] b = new byte[128];
@@ -196,7 +180,7 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
             fiStream = context.get().openFileInput(imageName);
             bitmap = BitmapFactory.decodeStream(fiStream);
             fiStream.close();
-            Log.d(TAG, "loadImageBitmapFromStorage: loaded image "+imageName);
+            Log.d(TAG, "loadImageBitmapFromStorage: loaded image " + imageName);
         } catch (Exception e) {
             Log.d(TAG, "Exception 3, Something went wrong!");
             e.printStackTrace();
@@ -213,7 +197,7 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
             foStream = context.get().openFileOutput(imageName, Context.MODE_PRIVATE);
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, foStream);
             foStream.close();
-            Log.d(TAG, "saveImageInStorage: saved image "+imageName);
+            Log.d(TAG, "saveImageInStorage: saved image " + imageName);
         } catch (Exception e) {
             Log.d(TAG, "Exception 2, Something went wrong!");
             e.printStackTrace();
@@ -236,7 +220,7 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
         public synchronized void handleMessage(Message msg) {
             Log.d(TAG, "handleMessage: notified bitmap");
             switch (msg.what) {
-                case SUCCESS_BITMAP: {
+                case SUCCESS: {
                     Log.d(TAG, "handleMessage: notified success bitmap");
                     onDownloadBitmap.onSuccess((Photo) msg.obj);
                     break;
