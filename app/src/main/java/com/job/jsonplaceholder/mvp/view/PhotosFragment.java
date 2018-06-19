@@ -74,6 +74,16 @@ public class PhotosFragment extends Fragment implements PhotosFragmentContractVi
         mPhotosAdapter.addPhotos(photos);
     }
 
+    @Override
+    public List<Photo> getPhotos() {
+        return mPhotosAdapter.gePhotos();
+    }
+
+    @Override
+    public void notifyImageLoaded(int index) {
+        mPhotosAdapter.notifyItemChanged(index);
+    }
+
     public static PhotosFragment newInstance(User user) {
         Bundle args = new Bundle();
         args.putParcelable(USER, user);

@@ -1,5 +1,7 @@
 package com.job.jsonplaceholder.pojo;
 
+import android.graphics.Bitmap;
+
 /**
  * Created by slavik on 6/19/18.
  */
@@ -7,6 +9,8 @@ package com.job.jsonplaceholder.pojo;
 public class Photo {
     private String title;
     private String url;
+    private Bitmap bitmap;
+    private int position;
 
     public Photo(String title, String url) {
         this.title = title;
@@ -27,5 +31,21 @@ public class Photo {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
+
+    public Bitmap getBitmap() {
+        return bitmap;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 }

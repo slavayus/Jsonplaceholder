@@ -23,7 +23,7 @@ public class PhotosFragmentPresenter {
     }
 
     private void downloadUserPhotos() {
-        model.downloadUserPhotos(view.get().gerUser(), new PhotosFragmentContractModel.OnDownloadPhotos(){
+        model.downloadUserPhotos(view.get().gerUser(), new PhotosFragmentContractModel.OnDownloadPhotos() {
 
             @Override
             public void onSuccess(List<Photo> photos) {
@@ -39,12 +39,28 @@ public class PhotosFragmentPresenter {
 
             @Override
             public void onComplete() {
-                startDownloadPhotosBitmap();
+                if (viewIsValid()) {
+                    startDownloadPhotosBitmap(view.get().getPhotos());
+                }
             }
         });
     }
 
-    private void startDownloadPhotosBitmap() {
+    private void startDownloadPhotosBitmap(List<Photo> photos) {
+        model.downloadPhotoBitmap(photos, new PhotosFragmentContractModel.OnDownloadBitmap() {
+
+            @Override
+            public void onSuccess(Photo photo) {
+                if (viewIsValid()) {
+                    view.get().notifyImageLoaded(photo.getPosition());
+                }
+            }
+
+            @Override
+            public void onError() {
+
+            }
+        });
 
     }
 
@@ -54,5 +70,6 @@ public class PhotosFragmentPresenter {
 
     public void destroyView() {
         view.clear();
+        model.stop();
     }
 }

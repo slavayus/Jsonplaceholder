@@ -10,4 +10,8 @@ public interface PhotosFragmentContractView {
     User gerUser();
 
     void showPhotos(List<Photo> photos);
+
+    List<Photo> getPhotos();
+
+    void notifyImageLoaded(int index);
 }

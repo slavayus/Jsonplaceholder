@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.job.jsonplaceholder.R;
@@ -39,19 +40,29 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotosHold
     public void addPhotos(List<Photo> photos) {
         mData.addAll(photos);
         notifyItemRangeInserted(mData.size() - photos.size(), photos.size());
+        for (int i = mData.size() - photos.size(); i < mData.size(); i++) {
+            mData.get(i).setPosition(i);
+        }
+    }
+
+    public List<Photo> gePhotos() {
+        return mData;
     }
 
 
     class PhotosHolder extends RecyclerView.ViewHolder {
         private TextView photoTitle;
+        private ImageView photoView;
 
         PhotosHolder(View view) {
             super(view);
             photoTitle = view.findViewById(R.id.photo_title);
+            photoView = view.findViewById(R.id.photo_image_view);
         }
 
         void bind(Photo photo) {
             photoTitle.setText(photo.getTitle());
+            photoView.setImageBitmap(photo.getBitmap());
         }
     }
 }
