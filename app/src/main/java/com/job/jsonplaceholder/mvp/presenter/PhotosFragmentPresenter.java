@@ -36,7 +36,16 @@ public class PhotosFragmentPresenter {
             public void onError() {
 
             }
+
+            @Override
+            public void onComplete() {
+                startDownloadPhotosBitmap();
+            }
         });
+    }
+
+    private void startDownloadPhotosBitmap() {
+
     }
 
     private boolean viewIsValid() {

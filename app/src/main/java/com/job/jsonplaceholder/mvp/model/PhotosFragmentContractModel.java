@@ -13,5 +13,7 @@ public interface PhotosFragmentContractModel {
         void onSuccess(List<Photo> photos);
 
         void onError();
+
+        void onComplete();
     }
 }

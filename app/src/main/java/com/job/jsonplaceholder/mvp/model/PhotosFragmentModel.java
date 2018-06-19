@@ -24,7 +24,8 @@ import java.util.List;
 
 public class PhotosFragmentModel implements PhotosFragmentContractModel {
     private static final String TAG = "PhotosFragmentModel";
-    private static final int SUCCESS = 200;
+    private static final int SUCCESS_ALBUM = 200;
+    private static final int SUCCESS_ALL = 201;
     private static final int ERROR = 400;
 
     @Override
@@ -35,8 +36,13 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
             try {
                 String userAlbumsAsString = downloadFromUri(URLHelper.ALBUMS_BY_USER_URL + user.getId());
                 JSONArray albumsAsJsonArray = new JSONArray(userAlbumsAsString);
-                List<Photo> photos = downloadPhotos(albumsAsJsonArray);
-                downloadUserPhotosHandler.sendMessage(downloadUserPhotosHandler.obtainMessage(SUCCESS, photos));
+
+                for (int i = 0; i < albumsAsJsonArray.length(); i++) {
+                    JSONObject album = albumsAsJsonArray.getJSONObject(i);
+                    downloadUserPhotosHandler.sendMessage(downloadUserPhotosHandler.obtainMessage(SUCCESS_ALBUM, parseAlbumPhotos(album)));
+                }
+
+                downloadUserPhotosHandler.sendMessage(downloadUserPhotosHandler.obtainMessage(SUCCESS_ALL));
             } catch (IOException | JSONException e) {
                 Log.d(TAG, "downloadUsers: error" + e.getMessage());
                 e.printStackTrace();
@@ -45,20 +51,16 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
         }).start();
     }
 
-    private List<Photo> downloadPhotos(JSONArray albumsAsJsonArray) throws JSONException, IOException {
-        List<Photo> photosList = new ArrayList<>();
-        for (int i = 0; i < albumsAsJsonArray.length(); i++) {
-            JSONObject album = albumsAsJsonArray.getJSONObject(i);
-            int id = album.getInt("id");
-            String photosByAlbumIdAsString = downloadFromUri(URLHelper.PHOTOS_BY_ALBUMS_ID_URL + id);
-            JSONArray photosJsonArray = new JSONArray(photosByAlbumIdAsString);
-            for (int j = 0; j < photosJsonArray.length(); j++) {
-                JSONObject jsonPhoto = photosJsonArray.getJSONObject(j);
-                photosList.add(new Photo(jsonPhoto.getString("title"), jsonPhoto.getString("url")));
-            }
+    private List<Photo> parseAlbumPhotos(JSONObject album) throws JSONException, IOException {
+        List<Photo> photos = new ArrayList<>();
+        int id = album.getInt("id");
+        String photosByAlbumIdAsString = downloadFromUri(URLHelper.PHOTOS_BY_ALBUMS_ID_URL + id);
+        JSONArray photosJsonArray = new JSONArray(photosByAlbumIdAsString);
+        for (int j = 0; j < photosJsonArray.length(); j++) {
+            JSONObject jsonPhoto = photosJsonArray.getJSONObject(j);
+            photos.add(new Photo(jsonPhoto.getString("title"), jsonPhoto.getString("url")));
         }
-
-        return photosList;
+        return photos;
     }
 
     private String downloadFromUri(String uri) throws IOException {
@@ -95,12 +97,17 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
         }
 
         @Override
-        public void handleMessage(Message msg) {
+        public synchronized void handleMessage(Message msg) {
             Log.d(TAG, "handleMessage: notified");
             switch (msg.what) {
-                case SUCCESS: {
+                case SUCCESS_ALBUM: {
                     Log.d(TAG, "handleMessage: notified success");
                     onDownloadPhotos.onSuccess(((List<Photo>) msg.obj));
+                    break;
+                }
+                case SUCCESS_ALL: {
+                    Log.d(TAG, "handleMessage: notified success all");
+                    onDownloadPhotos.onComplete();
                     break;
                 }
                 case ERROR: {

@@ -18,10 +18,6 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotosHold
 
     private List<Photo> mData = new ArrayList<>();
 
-    public PhotosAdapter(List<Photo> photos) {
-        this.mData.addAll(photos);
-    }
-
     @NonNull
     @Override
     public PhotosHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -38,6 +34,11 @@ public class PhotosAdapter extends RecyclerView.Adapter<PhotosAdapter.PhotosHold
     @Override
     public int getItemCount() {
         return mData.size();
+    }
+
+    public void addPhotos(List<Photo> photos) {
+        mData.addAll(photos);
+        notifyItemRangeInserted(mData.size() - photos.size(), photos.size());
     }
 
 

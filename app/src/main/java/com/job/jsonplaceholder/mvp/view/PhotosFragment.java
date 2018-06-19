@@ -25,6 +25,7 @@ public class PhotosFragment extends Fragment implements PhotosFragmentContractVi
     private User user;
     private RecyclerView mRecyclerView;
     private PhotosFragmentPresenter mPresenter;
+    private PhotosAdapter mPhotosAdapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,6 +48,8 @@ public class PhotosFragment extends Fragment implements PhotosFragmentContractVi
 
         mRecyclerView = view.findViewById(R.id.recycler_view_photos);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mPhotosAdapter = new PhotosAdapter();
+        mRecyclerView.setAdapter(mPhotosAdapter);
 
         mPresenter = new PhotosFragmentPresenter(new PhotosFragmentModel());
         mPresenter.attachView(this);
@@ -68,7 +71,7 @@ public class PhotosFragment extends Fragment implements PhotosFragmentContractVi
 
     @Override
     public void showPhotos(List<Photo> photos) {
-        mRecyclerView.setAdapter(new PhotosAdapter(photos));
+        mPhotosAdapter.addPhotos(photos);
     }
 
     public static PhotosFragment newInstance(User user) {
