@@ -51,7 +51,7 @@ public class PhotosFragment extends Fragment implements PhotosFragmentContractVi
         mPhotosAdapter = new PhotosAdapter();
         mRecyclerView.setAdapter(mPhotosAdapter);
 
-        mPresenter = new PhotosFragmentPresenter(new PhotosFragmentModel());
+        mPresenter = new PhotosFragmentPresenter(new PhotosFragmentModel(getContext()));
         mPresenter.attachView(this);
         mPresenter.viewIsReady();
 

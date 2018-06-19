@@ -7,13 +7,15 @@ import android.graphics.Bitmap;
  */
 
 public class Photo {
+    private int id;
     private String title;
     private String url;
     private Bitmap bitmap;
     private int position;
     private int progress;
 
-    public Photo(String title, String url) {
+    public Photo(int id, String title, String url) {
+        this.id = id;
         this.title = title;
         this.url = url;
     }
@@ -56,5 +58,13 @@ public class Photo {
 
     public void setProgress(int progress) {
         this.progress = progress;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

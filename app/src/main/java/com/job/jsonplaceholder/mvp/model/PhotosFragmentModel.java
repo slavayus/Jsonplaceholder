@@ -1,5 +1,6 @@
 package com.job.jsonplaceholder.mvp.model;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
@@ -17,9 +18,12 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -34,6 +38,11 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
     private static final int ERROR = 400;
     private static final int PROGRESS = 300;
     private AtomicBoolean running = new AtomicBoolean(true);
+    private WeakReference<Context> context;
+
+    public PhotosFragmentModel(Context context) {
+        this.context = new WeakReference<>(context);
+    }
 
     @Override
     public void downloadUserPhotos(User user, OnDownloadPhotos onDownloadPhotos) {
@@ -68,7 +77,7 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
         JSONArray photosJsonArray = new JSONArray(photosByAlbumIdAsString);
         for (int j = 0; j < photosJsonArray.length(); j++) {
             JSONObject jsonPhoto = photosJsonArray.getJSONObject(j);
-            photos.add(new Photo(jsonPhoto.getString("title"), jsonPhoto.getString("url")));
+            photos.add(new Photo(jsonPhoto.getInt("id"), jsonPhoto.getString("title"), jsonPhoto.getString("url")));
         }
         return photos;
     }
@@ -141,7 +150,8 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
                 }
                 Log.d(TAG, "downloadPhotoBitmap: start photo " + photo.getPosition());
                 try {
-                    photo.setBitmap(downloadBitmap(photo, downloadPhotoBitmapHandler));
+                    Bitmap bitmap = loadImageBitmapFromStorage(String.valueOf(photo.getId()));
+                    photo.setBitmap(bitmap == null ? downloadBitmap(photo, downloadPhotoBitmapHandler) : bitmap);
                     downloadPhotoBitmapHandler.sendMessage(downloadPhotoBitmapHandler.obtainMessage(SUCCESS_BITMAP, photo));
                 } catch (IOException e) {
                     Log.d(TAG, "downloadUsers: error" + e.getMessage());
@@ -159,7 +169,7 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
         connection.connect();
         InputStream input = connection.getInputStream();
 
-        int coefficient = 100 / ((connection.getContentLength()) / 128);
+        int coefficient = 100 / ((connection.getContentLength()) / 128)+1;
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         int c;
         byte[] b = new byte[128];
@@ -171,7 +181,43 @@ public class PhotosFragmentModel implements PhotosFragmentContractModel {
         }
 
         InputStream inputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
-        return BitmapFactory.decodeStream(inputStream);
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+        saveImageInStorage(bitmap, String.valueOf(photo.getId()));
+        return bitmap;
+    }
+
+    private Bitmap loadImageBitmapFromStorage(String imageName) {
+        Bitmap bitmap = null;
+        FileInputStream fiStream;
+        if (context.get() == null) {
+            return null;
+        }
+        try {
+            fiStream = context.get().openFileInput(imageName);
+            bitmap = BitmapFactory.decodeStream(fiStream);
+            fiStream.close();
+            Log.d(TAG, "loadImageBitmapFromStorage: loaded image "+imageName);
+        } catch (Exception e) {
+            Log.d(TAG, "Exception 3, Something went wrong!");
+            e.printStackTrace();
+        }
+        return bitmap;
+    }
+
+    private void saveImageInStorage(Bitmap bitmap, String imageName) {
+        FileOutputStream foStream;
+        if (context.get() == null) {
+            return;
+        }
+        try {
+            foStream = context.get().openFileOutput(imageName, Context.MODE_PRIVATE);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, foStream);
+            foStream.close();
+            Log.d(TAG, "saveImageInStorage: saved image "+imageName);
+        } catch (Exception e) {
+            Log.d(TAG, "Exception 2, Something went wrong!");
+            e.printStackTrace();
+        }
     }
 
     @Override
